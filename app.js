@@ -19,8 +19,8 @@ const adminRouter = require('./routes/admin');
 var app = express();
 
 //내 경로
-const basePath = '';
-                  //'/stud12';
+const basePath = //'';
+                  '/stud12';
 
 app.use((req, res, next) => {
   res.locals.basePath = basePath || "";
