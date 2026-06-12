@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>SYSTEM ERROR</title>
-    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="<%= basePath %>/stylesheets/style.css">
     <style>
         .error-terminal {
             max-width: 600px;
@@ -46,8 +46,8 @@
 <main class="error-terminal">
     <h2><%= error.status %> 오류 발생</h2>
     <p class="error-desc">
-        <%= message %> </p>
-    <a href="/" class="home-btn">홈 화면으로 돌아가기</a>
+        <%= message || '오류'%> </p>
+    <a href="/stud12" class="home-btn">홈 화면으로 돌아가기</a>
 </main>
 
 <%- include('footer') %>

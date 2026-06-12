@@ -6,7 +6,7 @@ const router = express.Router();
 const dbPath = path.join(__dirname, '../db/database.sqlite');
 const db = new sqlite3.Database(dbPath);
 
-router.post('/confirm', (req, res) => {
+router.post('/confirm', (req, res, next) => {
     const user = req.session.user;
     if (!user) {
         return res.status(401).render('login_required', {
@@ -18,12 +18,16 @@ router.post('/confirm', (req, res) => {
     const cartQuery = `
         SELECT c.product_id, c.quantity AS order_quantity, p.price, p.quantity AS stock_quantity, p.name AS product_name
         FROM cart_items c
-                 JOIN products p ON c.product_id = p.id
+        JOIN products p ON c.product_id = p.id
         WHERE c.user_id = ?
     `;
 
     db.all(cartQuery, [user.id], (err, cartItems) => {
-        if (err) return res.status(500).send('DB 오류: 장바구니 내역 조회 실패');
+        if (err) {
+            const error = new Error("장바구니 내역을 조회하지 못하였습니다.");
+            error.status = 500;
+            return next(error);
+        }
 
         if (!cartItems || cartItems.length === 0) {
             return res.render('order_confirm', {
@@ -52,7 +56,11 @@ router.post('/confirm', (req, res) => {
         }
 
         db.get('SELECT cash FROM users WHERE id = ?', [user.id], (errUser, currentUser) => {
-            if (errUser) return res.status(500).send('DB 오류: 회원 정보 조회 실패');
+            if (errUser) {
+                const error = new Error("회원 정보를 조회하지 못하였습니다.");
+                error.status = 500;
+                return next(error);
+            }
 
             if (currentUser.cash < totalPrice) {
                 return res.render('order_confirm', {
@@ -64,7 +72,11 @@ router.post('/confirm', (req, res) => {
             const insertOrderQuery = `INSERT INTO orders (user_id, total_price) VALUES (?, ?)`;
 
             db.run(insertOrderQuery, [user.id, totalPrice], function(errOrder) {
-                if (errOrder) return res.status(500).send('DB 오류: 주문서 생성 실패');
+                if (errOrder) {
+                    const error = new Error("주문내역을 작성하지 못하였습니다.");
+                    error.status = 500;
+                    return next(error);
+                }
 
                 const orderId = this.lastID; // 💡 새 주문 아이디 확보
                 let completedInserts = 0;
@@ -76,14 +88,18 @@ router.post('/confirm', (req, res) => {
                         [orderId, item.product_id, item.order_quantity, item.price], (errItem) => {
                             if (errItem && !hasError) {
                                 hasError = true;
-                                return res.status(500).send('DB 오류: 주문 상세 내역 기록 실패');
+                                const error = new Error("주문 상세 내역을 기록하지 못하였습니다.");
+                                error.status = 500;
+                                return next(error);
                             }
 
                             //상품 테이블 실시간 재고 차감
                             db.run('UPDATE products SET quantity = quantity - ? WHERE id = ?', [item.order_quantity, item.product_id], (errStockUpdate) => {
                                 if (errStockUpdate && !hasError) {
                                     hasError = true;
-                                    return res.status(500).send('DB 오류: 상품 재고 수량 갱신 실패');
+                                    const error = new Error("상품 수량을 갱신하지 못하였습니다.");
+                                    error.status = 500;
+                                    return next(error);
                                 }
 
                                 completedInserts++;
@@ -93,17 +109,26 @@ router.post('/confirm', (req, res) => {
                                     const newCash = currentUser.cash - totalPrice;
 
                                     db.run('UPDATE users SET cash = ? WHERE id = ?', [newCash, user.id], (errCashUpdate) => {
-                                        if (errCashUpdate) return res.status(500).send('DB 오류: 보유 금액 차감 실패');
+                                        if (errCashUpdate) {
+                                            const error = new Error("보유 금액을 차감하지 못하였습니다.");
+                                            error.status = 500;
+                                            return next(error);
+                                        }
 
                                         //세션 잔액 동기화
                                         req.session.user.cash = newCash;
 
                                         //장바구니 비우기
                                         db.run('DELETE FROM cart_items WHERE user_id = ?', [user.id], (errCartClean) => {
-                                            if (errCartClean) return res.status(500).send('DB 오류: 결제 후 장바구니 초기화 실패');
+                                            if (errCartClean) {
+                                                const error = new Error("결제 후 장바구니 초기화에 실패하였습니다.");
+                                                error.status = 500;
+                                                return next(error);
+                                            }
 
-                                            //주문내역 리다이렉트
-                                            res.redirect('../mypage/orderlist');
+                                            return res.render('order_confirm', {
+                                                user
+                                            });
                                         });
                                     });
                                 }

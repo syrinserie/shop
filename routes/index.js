@@ -19,7 +19,11 @@ router.get('/', function(req, res, next) {
     `;
 
   db.all(allProductsQuery, [userId], (err, allProducts) => {
-    if (err) return res.status(500).send('DB 오류: 전체 상품 조호 실패');
+    if (err) {
+      const error = new Error("전체 상품을 불러오는데 실패하였습니다.");
+      error.status = 500;
+      return next(error);
+    }
 
     //추천 상품도 위시리스트 추가여부 결합해서 조회
     const featuredQuery = `
@@ -31,7 +35,11 @@ router.get('/', function(req, res, next) {
         `;
 
     db.all(featuredQuery, [userId], (err2, featuredProducts) => {
-      if (err2) return res.status(500).send('DB 오류: 추천 상품 조회 실패');
+      if (err2) {
+        const error = new Error("추천 상품을 불러오는데 실패하였습니다.");
+        error.status = 500;
+        return next(error);
+      }
 
       //찜한 상품들의 ID만 모아서 심플한 배열 생성
       //로그인 상태가 아닐 때는 빈 배열

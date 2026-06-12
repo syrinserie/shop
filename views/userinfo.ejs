@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <title>마이페이지</title>
-    <link rel="stylesheet" href="../stylesheets/style.css">
+    <link rel="stylesheet" href="<%= basePath %>/stylesheets/style.css">
     <style>
         /* 회원 관리 화면 전역 컨테이너 */
         .user-terminal-container {
@@ -190,7 +190,7 @@
                 <button type="button" class="cart-button btn-user-modify" onclick="openUserEdit('<%= user.id %>')">수정하기</button>
             </div>
 
-            <form class="user-edit-form" action="../../mypage/userinfo/update" method="POST" style="display: none;">
+            <form class="user-edit-form" action="../mypage/userinfo/update" method="POST" style="display: none;">
                 <input type="hidden" name="userId" value="<%= user.id %>">
 
                 <div class="meta-segment" style="margin-top: 5px;">

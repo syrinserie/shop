@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="../../stylesheets/style.css">
+    <link rel="stylesheet" href="<%= basePath %>/stylesheets/style.css">
     <title><%= post.title %></title>
     <style>
         /* ==========================================================================
@@ -150,9 +150,9 @@
 
             <div class="detail-control-hub">
                 <% if(!isAnon && (isAdmin || isAuthor)) { %>
-                    <a href="/board/edit/<%= post.id %>">수정</a>
+                    <a href="../../board/edit/<%= post.id %>">수정</a>
                     <span style="color: rgba(255,255,255,0.1); margin: 0 4px;">|</span>
-                    <a href="/board/delete/<%= post.id %>" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</a>
+                    <a href="../../board/delete/<%= post.id %>" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</a>
                 <% } else { %>
                     <span class="disabled">수정</span>
                     <span style="color: rgba(255,255,255,0.1); margin: 0 4px;">|</span>
@@ -165,8 +165,8 @@
     <article class="detail-body-content"><%= post.content %></article>
 
     <nav class="detail-action-bar">
-        <a href="/board/reply/<%= post.id %>" class="btn-system-link">답글</a>
-        <a href="/board" class="btn-system-link btn-secondary-link">목록</a>
+        <a href="../../board/reply/<%= post.id %>" class="btn-system-link">답글</a>
+        <a href="../../board" class="btn-system-link btn-secondary-link">목록</a>
     </nav>
 </main>
 </body>

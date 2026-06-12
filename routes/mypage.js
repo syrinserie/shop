@@ -21,7 +21,7 @@ router.get('/', (req, res)=>{
 });
 
 //위시리스트 갱신
-router.post('/wishlist/update', (req, res)=>{
+router.post('/wishlist/update', (req, res, next)=>{
     const user = req.session.user;
     const { productId, action } = req.body;
 
@@ -42,7 +42,9 @@ router.post('/wishlist/update', (req, res)=>{
         db.run(query, [user.id, productId], function (err){
             if (err) {
                 console.error('위시리스트 추가 실패:', err.message);
-                return res.status(500).send('위시리스트 추가 실패');
+                const error = new Error("상품을 위시리스트에 추가하지 못하였습니다.");
+                error.status = 500;
+                return next(error);
             }
             res.redirect('../../mypage/wishlist');
         });
@@ -57,7 +59,9 @@ router.post('/wishlist/update', (req, res)=>{
         db.run(deleteQuery, [user.id, productId], function (err){
             if(err){
                 console.error('위시리스트 제거 실패:', err.message);
-                return res.status(500).send('위시리스트 제거 실패');
+                const error = new Error("상품을 위시리스트에서 제거하지 못하였습니다.");
+                error.status = 500;
+                return next(error);
             }
             res.redirect('../../mypage/wishlist');
         });
@@ -70,7 +74,7 @@ router.post('/wishlist/update', (req, res)=>{
 });
 
 //위시리스트 접속
-router.get('/wishlist', (req, res)=>{
+router.get('/wishlist', (req, res, next)=>{
     const user = req.session.user;
     if (!user) {
         return res.status(401).render('login_required', {
@@ -89,7 +93,11 @@ router.get('/wishlist', (req, res)=>{
     `;
 
     db.all(query, [user.id], (err, rows) =>{
-        if(err) return res.status(500).send('위시리스트 조회 실패');
+        if(err) {
+            const error = new Error("위시리스트를 조회하지 못하였습니다.");
+            error.status = 500;
+            return next(error);
+        }
         res.render('wishlist', {
             wishItems: rows,
             user});
@@ -97,7 +105,7 @@ router.get('/wishlist', (req, res)=>{
 });
 
 //회원 정보 접속
-router.get('/userinfo', (req, res)=>{
+router.get('/userinfo', (req, res, next)=>{
     const user = req.session.user;
 
     if (!user) {
@@ -131,7 +139,9 @@ router.post('/userinfo/update', (req, res) => {
     db.run(updateQuery, [name, user.id], (err) => {
         if (err) {
             console.error('DB 오류: 회원 자체 정보 변경 실패 -', err.message);
-            return res.status(500).send('프로필 정보 가공 도중 시스템 오류가 발생했습니다.');
+            const error = new Error("회원 정보를 변경하는데 실패하였습니다.");
+            error.status = 500;
+            return next(error);
         }
 
         //현재 클라이언트 브라우저 세션 스토리지의 닉네임 동기화
@@ -143,7 +153,7 @@ router.post('/userinfo/update', (req, res) => {
 });
 
 //회원 탈퇴
-router.post('/userinfo/delete', (req, res) => {
+router.post('/userinfo/delete', (req, res, next) => {
     const user = req.session.user;
     if (!user) {
         return res.status(401).render('login_required', {
@@ -160,22 +170,27 @@ router.post('/userinfo/delete', (req, res) => {
     db.run(deleteQuery, [user.id], (err) => {
         if (err) {
             console.error('DB 오류: 회원 탈퇴 처리 실패 -', err.message);
-            return res.status(500).send('회원 탈퇴 처리 도중 시스템 레벨 오류가 발생했습니다.');
+            const error = new Error("회원 탈퇴 처리 중 오류가 발생하였습니다.");
+            error.status = 500;
+            return next(error);
         }
 
         //세션 정보 제거
         req.session.destroy((errSession) => {
             if (errSession) {
                 console.error('세션 제거 실패 -', errSession.message);
+                const error = new Error("세션을 제거하는데 실패하였습니다.");
+                error.status = 500;
+                return next(error);
             }
             //홈화면으로 리다이렉트
-            res.redirect('../../');
+            res.redirect('../');
         });
     });
 });
 
 
-router.get('/orderlist', (req, res)=>{
+router.get('/orderlist', (req, res, next)=>{
     const user = req.session.user;
 
     if (!user) {
@@ -206,7 +221,9 @@ router.get('/orderlist', (req, res)=>{
     db.all(query, [user.id], (err, rows) =>{
         if(err){
             console.error('주문 내역 조회 오류:', err.message);
-            return res.status(500).send('DB 오류: 주문 내역을 불러오지 못했습니다.');
+            const error = new Error("주문 내역을 불러오지 못하였습니다.");
+            error.status = 500;
+            return next(error);
         }
 
         //같은 주문 번호를 기준으로 상품 배열을 묶기

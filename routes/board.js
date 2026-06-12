@@ -44,7 +44,7 @@ router.post('/new',(req,res, next)=>{
             error.status = 500;
             return next(error);
         }
-        res.redirect('/board');
+        res.redirect('../board');
         });
 });
 
@@ -142,7 +142,7 @@ router.post('/edit/:id',(req,res, next)=>{
 });
 
 //삭제
-router.get('/delete/:id', (req, res)=>{
+router.get('/delete/:id', (req, res, next)=>{
     const postId = req.params.id;
     const {title, content} = req.body;
     const user = req.session.user;
@@ -184,13 +184,13 @@ router.get('/delete/:id', (req, res)=>{
                     error.status = 500;
                     return next(error);
                 }
-                res.redirect(`/board`);
+                res.redirect(`../../board`);
             }
         );
     });
 });
 
-router.post('/create', (req, res)=>{
+router.post('/create', (req, res, next)=>{
     const {author, title, content, parent_id} = req.body;
     db.run(
         'INSERT INTO posts (author, title, content, parent_id) VALUES(?, ?, ?, ?)',
@@ -201,7 +201,7 @@ router.post('/create', (req, res)=>{
                 error.status = 500;
                 return next(error);
             }
-            res.redirect('/board');
+            res.redirect('./board');
         }
     )
 })

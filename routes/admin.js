@@ -22,7 +22,7 @@ router.get('/', (req, res)=>{
     res.render('admin/admin');
 });
 
-router.get('/products', (req, res)=>{
+router.get('/products', (req, res, next)=>{
     const user = req.session.user;
     const userId = user ? user.id : null;
 
@@ -52,7 +52,7 @@ router.get('/products', (req, res)=>{
     });
 });
 //상품 추가
-router.post('/products/add', (req, res) => {
+router.post('/products/add', (req, res, next) => {
     const { name, description, price, emoji, image, quantity } = req.body;
     const is_featured = req.body.is_featured === '1' ? 1 : 0;
 
@@ -68,12 +68,12 @@ router.post('/products/add', (req, res) => {
             error.status = 500;
             return next(error);
         }
-        res.redirect('/admin/products');
+        res.redirect('../../admin/products');
     });
 });
 
 //상품 수정
-router.post('/products/update', (req, res) => {
+router.post('/products/update', (req, res, next) => {
     const { productId, name, description, price, emoji, image, quantity } = req.body;
 
     const is_featured = req.body.is_featured === '1' ? 1 : 0;
@@ -91,12 +91,12 @@ router.post('/products/update', (req, res) => {
             error.status = 500;
             return next(error);
         }
-        res.redirect('/admin/products');
+        res.redirect('../../admin/products');
     });
 });
 
 //상품 삭제
-router.post('/products/delete', (req, res) => {
+router.post('/products/delete', (req, res, next) => {
     const { productId } = req.body;
 
     const deleteQuery = `
@@ -111,11 +111,11 @@ router.post('/products/delete', (req, res) => {
             error.status = 500;
             return next(error);
         }
-        res.redirect('/admin/products');
+        res.redirect('../../admin/products');
     });
 });
 
-router.get('/users', (req, res) => {
+router.get('/users', (req, res, next) => {
     const query = 'SELECT * FROM users';
 
     db.all(query, [], (err, rows) => {
@@ -134,7 +134,7 @@ router.get('/users', (req, res) => {
 });
 
 //회원정보 수정
-router.post('/users/update', (req, res) => {
+router.post('/users/update', (req, res, next) => {
     const { userId, name, cash } = req.body;
     const currentUser = req.session.user;
 
@@ -158,11 +158,11 @@ router.post('/users/update', (req, res) => {
             req.session.user.cash = Number(cash);
         }
         //수정 완료 후 리다이렉트
-        res.redirect('/admin/users');
+        res.redirect('../../admin/users');
     });
 });
 
-router.get('/orders', (req, res) => {
+router.get('/orders', (req, res, next) => {
     // orders, order_items, products, users 테이블을 결합하여
     // 주문 마스터 정보와 주문한 유저의 식별 정보, 상품 상세 정보를 한 번에 추출합니다.
     const query = `
@@ -229,7 +229,7 @@ router.get('/orders', (req, res) => {
 });
 
 // 2️⃣ 주문 상태 관리 제어 엔진 (결제완료/배송준비/배송중/배송완료/주문취소 상태 원격 업데이트)
-router.post('/orders/update', (req, res) => {
+router.post('/orders/update', (req, res, next) => {
     const { orderId, status } = req.body;
 
     const updateQuery = `
@@ -247,7 +247,7 @@ router.post('/orders/update', (req, res) => {
         }
 
         console.log(`[시스템 상태] 주문 번호 #${orderId}의 상태가 [${status}](으)로 갱신되었습니다.`);
-        res.redirect('/admin/orders');
+        res.redirect('../../admin/orders');
     });
 });
 

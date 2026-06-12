@@ -11,7 +11,7 @@ router.get('/register',(req, res) =>{
     res.render('register');
 });
 
-router.post('/register', async (req, res)=>{
+router.post('/register', async (req, res, next)=>{
     const {username, password, name} = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -21,7 +21,9 @@ router.post('/register', async (req, res)=>{
         (err)=>{
             if(err){
                 console.error(err.message);
-                return res.send('회원가입 실패');
+                const error = new Error("회원 가입에 실패하였습니다.");
+                error.status = 500;
+                return next(error);
             }
             res.redirect('./login');
         }
@@ -32,14 +34,12 @@ router.get('/login', (req, res)=>{
     res.render('login');
 })
 
-router.post('/login', (req, res)=>{
+router.post('/login', (req, res, next)=>{
     const {username, password} = req.body;
 
     db.get('SELECT * FROM users WHERE username = ?',[username], async (err, user)=>{
         if(err || !user){
-            return res.status(500).render('error', {
-                message: "존재하지 않는 사용자입니다"
-            });
+            return res.status(401).render('login_failed', {message: '존재하지 않는 아이디입니다.'});
         }
 
         const match = await bcrypt.compare(password, user.password);
@@ -51,16 +51,16 @@ router.post('/login', (req, res)=>{
                 cash: user.cash,
                 isAdmin: user.is_admin
             }
-            res.redirect('/');
+            res.redirect("../");
         } else{
-            res.status(401).render('login_failed');
+            return res.status(401).render('login_failed', {message: '비밀번호를 틀렸습니다.'});
         }
     });
 });
 
 router.get('/logout', (req, res)=>{
     req.session.destroy();
-    res.redirect('/');
+    res.redirect('../');
 });
 
 

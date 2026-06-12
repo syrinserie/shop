@@ -2,22 +2,68 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>주문 확인</title>
-    <link rel="stylesheet" href="../stylesheets/style.css">
+    <title>ORDER TERMINAL - 주문 확인</title>
+    <link rel="stylesheet" href="<%= basePath %>/stylesheets/style.css">
+    <style>
+        /* 기존에 드린 디자인 CSS 코드는 그대로 유지하시면 됩니다 */
+        .order-terminal {
+            max-width: 600px;
+            margin: 60px auto;
+            padding: 40px;
+            background: #11141a;
+            border: 2px solid #d4af37;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.15);
+        }
+        .order-terminal h2 { color: #f3e5ab; font-size: 2rem; margin-top: 0; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 12px rgba(243, 229, 171, 0.4); }
+        .order-terminal.error-state { border-color: #ff0055; box-shadow: 0 0 25px rgba(255, 0, 85, 0.25); }
+        .order-terminal.error-state h2 { color: #ff0055; text-shadow: 0 0 12px rgba(255, 0, 85, 0.5); }
+        .order-terminal p { color: #c5c6c7; font-size: 1.15rem; line-height: 1.8; margin: 12px 0; }
+        .order-terminal .accent-name { color: #ffffff; font-weight: bold; border-bottom: 2px dashed #d4af37; padding-bottom: 2px; }
+        .order-terminal .status-msg { font-size: 1.3rem; color: #facc15; font-weight: 700; margin: 25px 0; text-shadow: 0 0 8px rgba(250, 204, 21, 0.2); }
+        .order-terminal .error-msg { color: #ff0055; font-weight: bold; background: rgba(255, 0, 85, 0.07); padding: 15px; border-radius: 5px; border: 1px solid rgba(255, 0, 85, 0.2); font-family: monospace; font-size: 1.05rem; }
+        .order-actions { display: flex; justify-content: center; gap: 15px; margin-top: 35px; }
+        .order-actions .btn { display: inline-block; padding: 12px 24px; font-size: 0.95rem; font-weight: bold; text-decoration: none; border-radius: 4px; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; }
+        .order-actions .btn-secondary { background-color: #1f232d; color: #c5c6c7; border: 1px solid rgba(197, 198, 199, 0.3); }
+        .order-actions .btn-secondary:hover { background-color: #2d3342; color: #ffffff; border-color: #ffffff; }
+        .order-actions .btn-primary { background-color: #d4af37; color: #0b0c10; border: 1px solid #d4af37; box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
+        .order-actions .btn-primary:hover { background-color: #f3e5ab; border-color: #f3e5ab; box-shadow: 0 0 18px rgba(243, 229, 171, 0.5); transform: translateY(-1px); }
+    </style>
 </head>
 <body>
-<div class="container">
-    <h2>주문 확인</h2>
+<%- include('header') %>
 
-    <% if(typeof error !== 'undefined') { %>
-    <p style="color: red; font-weight: bold;"><%= error %></p>
-    <% } else { %>
-    <p><%= user.name %>님, 주문이 정상적으로 접수되었습니다.</p>
-    <p>감사합니다!</p>
-    <% } %>
-    <p>
-        <a href="/" class="btn">홈으로 돌아가기</a>
-    </p>
-</div>
+<main class="container">
+    <%
+    let isError = false;
+    if (typeof error !== 'undefined' && error) {
+        isError = true;
+    }
+    %>
+
+    <div class="order-terminal <%= isError ? 'error-state' : '' %>">
+
+        <% if (isError) { %>
+            <h2>
+                주문에 실패하였습니다!
+            </h2>
+            <p class="error-msg"><%= error %></p>
+        <% } else { %>
+            <h2>감사합니다!</h2>
+            <p>
+                <span class="accent-name"><%= user ? user.name : '고객' %></span> 회원님,
+            </p>
+            <p class="status-msg">요청하신 데이터 주문이 정상 승인 및 접수되었습니다.</p>
+        <% } %>
+
+        <div class="order-actions">
+            <a href="<%= basePath %>/mypage/orderlist" class="btn btn-secondary">주문 내역 보기</a>
+            <a href="<%= basePath %>/" class="btn btn-primary">메인 허브로 복귀</a>
+        </div>
+    </div>
+</main>
+
+<%- include('footer') %>
 </body>
 </html>

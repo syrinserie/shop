@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="./stylesheets/style.css">
+    <link rel="stylesheet" href="<%= basePath %>/stylesheets/style.css">
     <style>
         /* ==========================================================================
    1. 글쓰기 버튼 스타일 ([글쓰기])
@@ -150,9 +150,9 @@
         <span class="edit-form">
         (
             <% if(!isAnon && (isAdmin || isAuthor)) { %>
-                <a href="/board/edit/<%= post.id%>">수정</a>
+                <a href="./board/edit/<%= post.id%>">수정</a>
                 /
-                <a href="/board/delete/<%= post.id %>" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</a>
+                <a href="./board/delete/<%= post.id %>" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</a>
             <% } else { %>
                 <span class="disabled">수정</span>
                 /

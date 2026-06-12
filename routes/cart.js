@@ -6,14 +6,14 @@ const router = express.Router();
 const dbPath = path.join(__dirname, '../db/database.sqlite');
 const db = new sqlite3.Database(dbPath);
 
-router.post('/add', (req, res)=>{
+router.post('/add', (req, res, next)=>{
     const user = req.session.user;
     const productId = req.body.productId;
 
     if(!user){
         return res.status(401).render('login_required', {
             message: '장바구니에 담기 위해서는 로그인이 필요합니다.',
-            redirectUrl: '../user/login'
+            redirectUrl: '/user/login'
         });
     }
 
@@ -22,12 +22,16 @@ router.post('/add', (req, res)=>{
         'ON CONFLICT(user_id, product_id) DO UPDATE SET quantity = quantity + 1';
 
     db.run(query, [user.id, productId], function (err){
-        if (err) return res.status(500).send('장바구니 추가 실패');
+        if (err) {
+            const error = new Error("장바구니에 상품을 담지 못했습니다.");
+            error.status = 500;
+            return next(error);
+        }
         res.redirect('./');
     });
 });
 
-router.get('/', (req, res)=>{
+router.get('/', (req, res, next)=>{
     const user = req.session.user;
     if (!user) {
         return res.status(401).render('login_required', {
@@ -44,12 +48,16 @@ router.get('/', (req, res)=>{
     `;
 
     db.all(query, [user.id], (err, rows) =>{
-        if(err) return res.status(500).send('장바구니 조회 실패');
+        if(err) {
+            const error = new Error("장바구니를 조회하지 못했습니다.");
+            error.status = 500;
+            return next(error);
+        }
         res.render('cart', {cartItems: rows, user});
     });
 });
 
-router.post('/update', (req, res) => {
+router.post('/update', (req, res, next) => {
     const user = req.session.user;
     const { productId, action } = req.body;
 
@@ -59,7 +67,9 @@ router.post('/update', (req, res) => {
     db.get(checkQuery, [user.id, productId], (err, row) => {
         if (err) {
             console.error('수량 조회 실패: ', err.message);
-            return res.status(500).send('수량 조회 실패');
+            const error = new Error("상품 수량을 조회하지 못했습니다.");
+            error.status = 500;
+            return next(error);
         }
         //상품 수 1 증가
         if(action === 'increase'){
@@ -67,7 +77,9 @@ router.post('/update', (req, res) => {
             db.run(updateQuery, [user.id, productId], (err)=>{
                 if(err){
                     console.error('수량 증가 실패:', err.message);
-                    return res.status(500).send('수량 증가 실패');
+                    const error = new Error("상품 수량을 증가시키지 못했습니다.");
+                    error.status = 500;
+                    return next(error);
                 }
                 res.redirect('../cart');
             });
@@ -80,7 +92,9 @@ router.post('/update', (req, res) => {
                 db.run(updateQuery, [user.id, productId], (err)=>{
                     if(err){
                         console.error('수량 감소 실패:', err.message);
-                        return res.status(500).send('수량 감소 실패');
+                        const error = new Error("상품 수량을 감소시키지 못했습니다.");
+                        error.status = 500;
+                        return next(error);
                     }
                     res.redirect('../cart');
                 });
@@ -91,7 +105,9 @@ router.post('/update', (req, res) => {
                 db.run(deleteQuery, [user.id, productId], (err)=>{
                     if(err){
                         console.error('삭제 실패:', err.message);
-                        return res.status(500).send('삭제 실패');
+                        const error = new Error("상품을 제거하지 못하였습니다.");
+                        error.status = 500;
+                        return next(error);
                     }
                     res.redirect('../cart');
                 });
@@ -102,7 +118,7 @@ router.post('/update', (req, res) => {
 
 });
 
-router.post('/delete', (req, res)=>{
+router.post('/delete', (req, res, next)=>{
     const user = req.session.user;
     const { productId } = req.body;
 
@@ -112,7 +128,9 @@ router.post('/delete', (req, res)=>{
     db.get(checkQuery, [user.id, productId], (err, row) =>{
         if(err){
             console.error('수량 조회 실패: ',err.message);
-            return res.status(500).send('수량 조회 실패');
+            const error = new Error("상품 수량을 조회하지 못하였습니다.");
+            error.status = 500;
+            return next(error);
         }
 
         //수량 0개 -> 리다이렉트
@@ -124,7 +142,9 @@ router.post('/delete', (req, res)=>{
             db.run(deleteQuery, [user.id, productId], (err)=>{
                 if(err){
                     console.error('삭제 실패:', err.message);
-                    return res.status(500).send('삭제 실패');
+                    const error = new Error("상품을 삭제하지 못하였습니다.");
+                    error.status = 500;
+                    return next(error);
                 }
                 res.redirect('../cart');
             });

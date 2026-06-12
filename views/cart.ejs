@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>장바구니</title>
-    <link rel="stylesheet" href="../stylesheets/style.css">
+    <link rel="stylesheet" href="<%= basePath %>/stylesheets/style.css">
     <style>
         /* ==========================================================================
            🛒 장바구니 터미널 독점 고도화 레이아웃 (기존 다크/골드 테마 기조 반영)
@@ -288,7 +288,7 @@
         <% } %>
     </ul>
 
-    <p><a href="<%= basePath %>/products" class="back-to-mall-gate">← 쇼핑 계속하기 (상품 보러가기)</a></p>
+    <p><a href="<%= basePath %>/products/all" class="back-to-mall-gate">← 쇼핑 계속하기 (상품 보러가기)</a></p>
 </main>
 
 <%- include('footer') %>

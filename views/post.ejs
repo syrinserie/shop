@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title><%= post ? '글 수정' : (parentId ? '답글 작성': '새 글 작성') %></title>
-    <link rel="stylesheet" href="../../stylesheets/style.css">
-    <link rel="stylesheet" href="../stylesheets/style.css">
-    <link rel="stylesheet" href="./stylesheets/style.css">
+    <link rel="stylesheet" href="<%= basePath %>/stylesheets/style.css">
 </head>
 <%- include('header') %>
 <body>
@@ -16,7 +14,7 @@
         작성자: <span><%= user ? user.username : '익명' %></span>
     </div>
 
-    <form action="<%= post ? '../../board/edit/' + post.id : '/board/new' %>" method="post">
+    <form action="<%= post ? '../../board/edit/' + post.id : '../board/new' %>" method="post">
         <input type="hidden" name="parent_id" value="<%= post ? post.parent_id : parentId %>">
 
         <div class="input-group">
