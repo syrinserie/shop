@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../../stylesheets/style.css">
+    <title><%= post.title %></title>
+    <style>
+        /* ==========================================================================
+           게시글 상세 페이지 맞춤 커스텀 레이아웃 (style.css 테마 동기화)
+           ========================================================================== */
+        .board-detail-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* 1. 상단 타이틀 영역 (중앙 정렬) */
+        .detail-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        }
+        .detail-header h2 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: #f3e5ab;
+            text-shadow: 0 0 10px rgba(243, 229, 171, 0.4);
+        }
+
+        /* 2. 작성자 정보 및 수정/삭제 제어판 영역 (우측 정렬 바) */
+        .detail-meta-bar {
+            display: table;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .detail-meta-right {
+            display: table-cell;
+            text-align: right;
+            vertical-align: middle;
+            font-size: 0.95rem;
+            color: #8f9aa6;
+        }
+        .detail-meta-info {
+            display: inline-block;
+            margin-right: 15px;
+        }
+        .detail-meta-info strong {
+            color: #c5c6c7;
+        }
+
+        /* 수정/삭제 제어판 스타일 */
+        .detail-control-hub {
+            display: inline-block;
+            background: #11141a;
+            padding: 4px 12px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .detail-control-hub a {
+            color: #d4af37;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+        }
+        .detail-control-hub a:hover {
+            color: #f3e5ab;
+        }
+
+        /* 원본 비활성화 스타일 보존 및 연동 */
+        .disabled {
+            color: #4a5568 !important;
+            opacity: 0.5;
+            pointer-events: none;
+            cursor: not-allowed;
+            font-size: 0.9rem;
+            font-weight: normal;
+        }
+
+        /* 3. 게시글 본문 영역 */
+        .detail-body-content {
+            background-color: #11141a;
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            border-radius: 6px;
+            padding: 30px;
+            min-height: 250px;
+            line-height: 1.6;
+            color: #cbd5e1;
+            font-size: 1.05rem;
+            white-space: pre-wrap; /* 줄바꿈 기호 보존 */
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+            margin-bottom: 25px;
+        }
+
+        /* 4. 하단 내비게이션 액션바 (우측 아래 정렬) */
+        .detail-action-bar {
+            text-align: right;
+            margin-top: 20px;
+            margin-bottom: 40px;
+        }
+
+        /* 기존 쇼핑몰 스타일 단추 연동 및 변형 */
+        .btn-system-link {
+            display: inline-block;
+            padding: 8px 18px;
+            color: #0b0c10 !important;
+            background-color: #d4af37;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 4px;
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.2);
+            transition: all 0.2s ease;
+            margin-left: 8px;
+            font-size: 0.95rem;
+        }
+        .btn-system-link:hover {
+            background-color: #f3e5ab;
+            box-shadow: 0 0 14px rgba(243, 229, 171, 0.5);
+        }
+        .btn-secondary-link {
+            background-color: #4a5568;
+            color: #ffffff !important;
+            box-shadow: none;
+        }
+        .btn-secondary-link:hover {
+            background-color: #64748b;
+        }
+    </style>
+</head>
+<body>
+<%- include('header') %>
+<main class="board-detail-container">
+    <% const isAuthor = user && user.username === post.author; %>
+    <% const isAdmin = user && user.isAdmin === 1; %>
+    <% const isAnon = user && user.username === '익명'; %>
+
+    <header class="detail-header">
+        <h2><%= post.title %></h2>
+    </header>
+
+    <div class="detail-meta-bar">
+        <div class="detail-meta-right">
+            <div class="detail-meta-info">
+                작성자: <strong><%= post.author %></strong>
+            </div>
+            <div class="detail-meta-info" style="margin-right: 20px;">
+                작성일: <strong><%= post.created_at %></strong>
+            </div>
+
+            <div class="detail-control-hub">
+                <% if(!isAnon && (isAdmin || isAuthor)) { %>
+                    <a href="/board/edit/<%= post.id %>">수정</a>
+                    <span style="color: rgba(255,255,255,0.1); margin: 0 4px;">|</span>
+                    <a href="/board/delete/<%= post.id %>" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</a>
+                <% } else { %>
+                    <span class="disabled">수정</span>
+                    <span style="color: rgba(255,255,255,0.1); margin: 0 4px;">|</span>
+                    <span class="disabled">삭제</span>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <article class="detail-body-content"><%= post.content %></article>
+
+    <nav class="detail-action-bar">
+        <a href="/board/reply/<%= post.id %>" class="btn-system-link">답글</a>
+        <a href="/board" class="btn-system-link btn-secondary-link">목록</a>
+    </nav>
+</main>
+</body>
+<%- include('footer') %>
+</html>

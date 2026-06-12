@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>위시리스트</title>
+    <link rel="stylesheet" href="../stylesheets/style.css">
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+        h2 {
+            margin-bottom: 20px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 12px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .item-line {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .delete-button {
+            background-color: #e53e3e;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .delete-button:hover {
+            background-color: #c53030;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #2563eb;
+        }
+    </style>
+    <style>
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+        }
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+        .product-card img {
+            width: 100%;
+            max-height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .cart-button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #22c55e;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .cart-button:hover {
+            background-color: #16a34a;
+        }
+
+        .back-link {
+            color: #facc15;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .cart-empty-state {
+            text-align: center;
+            padding: 60px 0;
+            color: #8f9aa6;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 1.05rem;
+        }
+    </style>
+</head>
+<%- include('header') %>
+<body>
+<h2><%= user.username %>님의 위시리스트</h2>
+<div class="product-grid">
+    <% if (wishItems.length === 0) { %>
+        <div class="cart-empty-state">
+            위시리스트가<br>
+            비어 있습니다.
+        </div>
+    <% } else { wishItems.forEach(p => {%>
+        <div class="product-card">
+            <img src="../<%= p.image %>" alt="<%= p.name %>">
+            <h3><%= p.emoji %><%= p.name %></h3>
+
+            <p><%= p.description %></p>
+            <p>남은 수량: <%= p.quantity %>개</p>
+            <strong>￦<%= p.price.toLocaleString() %></strong>
+            <form action="../mypage/wishlist/update" method="POST">
+                <input type="hidden" name="productId" value="<%= p.id %>">
+                <button type="submit" class="wish-button" name="action" value="remove">위시리스트에서 제거</button>
+            </form>
+            <form action="../cart/add" method="POST">
+                <input type="hidden" name="productId" value="<%= p.id %>">
+                <button type="submit" class="cart-button">장바구니 담기</button>
+            </form>
+        </div>
+    <% });} %>
+</div>
+<p><a href="../products" class="back-link">←상품 보러가기</a></p>
+</body>
+<%- include('footer') %>
+</html>

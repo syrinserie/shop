@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+    <link rel="stylesheet" href="../stylesheets/style.css">
+    <link rel="stylesheet" href="./stylesheets/style.css">
+</head>
+<%- include('header') %>
+<body>
+<main class="form-container" style="max-width: 500px;">
+    <h2>회원가입</h2>
+    <form action="./register" method="post">
+        <div class="input-group">
+            <label for="name">이름</label>
+            <input type="text" id="name" name="name" placeholder="실명을 입력하세요" required>
+        </div>
+        <div class="input-group">
+            <label for="username">아이디</label>
+            <input type="text" id="username" name="username" placeholder="사용할 아이디 입력" required>
+        </div>
+        <div class="input-group">
+            <label for="password">비밀번호</label>
+            <input type="password" id="password" name="password" placeholder="비밀번호 설정" required>
+        </div>
+        <div class="form-actions" style="margin-top: 25px;">
+            <button type="submit" class="submit-btn" style="width: 100%;">가입하기</button>
+        </div>
+    </form>
+</main>
+</body>
+<%- include('footer') %>
+</html>

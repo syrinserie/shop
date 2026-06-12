@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>상품목록</title>
+    <link rel="stylesheet" href="../stylesheets/style.css">
+
+</head>
+<body>
+<%- include('header') %>
+    <main>
+        <h2>전체 상품 목록</h2>
+        <div class="product-grid">
+            <% products.forEach(p => { %>
+            <div class="product-card">
+                <img src="../<%= p.image %>" alt="<%= p.name %>">
+                <h3><%= p.emoji %><%= p.name %>
+                    <% if (p.is_featured === 1) { %>
+                    <span style="color: #facc15; font-size: 0.9em;">추천</span>
+                    <% } %>
+                </h3>
+
+                <p><%= p.description %></p>
+                <p>남은 수량: <%= p.quantity %>개</p>
+                <strong>￦<%= p.price.toLocaleString() %></strong>
+                <form action="../mypage/wishlist/update" method="POST">
+                    <input type="hidden" name="productId" value="<%= p.id %>">
+                    <% if (wishedProductIds.includes(p.id)) { %>
+                        <button type="submit" class="wish-button" name="action" value="remove">위시리스트에서 제거</button>
+                    <%} else {%>
+                        <button type="submit" class="wish-button" name="action" value="add">위시리스트에 추가</button>
+                    <% } %>
+                </form>
+                <form action="../cart/add" method="POST">
+                    <input type="hidden" name="productId" value="<%= p.id %>">
+                    <button type="submit" class="cart-button">장바구니 담기</button>
+                </form>
+            </div>
+            <% }) %>
+        </div>
+    </main>
+<%- include('footer') %>
+</body>
+</html>

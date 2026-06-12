@@ -1,0 +1,40 @@
+<header>
+    <h1>사이버쇼핑몰</h1>
+    <% if(!user) { %>
+        <div class="auth-actions">
+            <a href="<%= basePath %>/user/login">로그인</a>
+            <a href="<%= basePath %>/user/register">회원가입</a>
+        </div>
+    <% } else { %>
+        <div class="user-actions">
+            <span class="welcome-msg"><%= user.name %> 님 </span>
+            <span class="user-cash">보유금액: ₩<%= user.cash.toLocaleString() %></span>
+            <a href="<%= basePath %>/user/logout" class="logout-btn">로그아웃</a>
+        </div>
+    <% } %>
+
+    <nav>
+        <a href="<%= basePath %>/">홈</a>
+        <a href="<%= basePath %>/products/all">상품목록</a>
+        <a href="<%= basePath %>/cart">장바구니</a>
+        <div class="dropdown">
+            <a href="<%= basePath %>/mypage" class="dropdown-trigger">마이페이지</a>
+            <div class="dropdown-content">
+                <a href="<%= basePath %>/mypage/userinfo">내 정보 관리</a>
+                <a href="<%= basePath %>/mypage/wishlist">위시리스트</a>
+                <a href="<%= basePath %>/mypage/orderlist">주문내역</a>
+            </div>
+        </div>
+        <a href="<%= basePath %>/board">고객센터</a>
+        <% if (user && user.isAdmin === 1) { %>
+            <div class="dropdown admin-dropdown">
+                <a href="<%= basePath %>/admin" class="dropdown-trigger admin-trigger">관리자 메뉴</a>
+                <div class="dropdown-content admin-content">
+                    <a href="<%= basePath %>/admin/products">상품 관리</a>
+                    <a href="<%= basePath %>/admin/users">회원 관리</a>
+                    <a href="<%= basePath %>/admin/orders">주문 관리</a>
+                </div>
+            </div>
+        <% } %>
+    </nav>
+</header>

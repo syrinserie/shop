@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>답글 작성</title>
+    <link rel="stylesheet" href="../../stylesheets/style.css">
+    <link rel="stylesheet" href="../stylesheets/style.css">
+    <link rel="stylesheet" href="./stylesheets/style.css">
+</head>
+<%- include('header') %>
+<body>
+<main class="form-container">
+    <h2>답글 작성</h2>
+
+    <div class="author-info" style="margin-bottom: 15px; padding-bottom: 5px; border-bottom: none;">
+        <strong>원글 제목:</strong> <span style="color: #ffffff;"><%= parentTitle %></span>
+    </div>
+    <div class="author-info" style="margin-top: 0;">
+        작성자: <span><%= user ? user.username : '익명' %></span>
+    </div>
+
+    <form action="/board/create" method="POST">
+        <input type="hidden" name="parent_id" value="<%= parentId %>">
+
+        <div class="input-group">
+            <label for="author"></label>
+            <input type="hidden" id="author" name="author" value="<%= user ? user.username : '' %>" required>
+        </div>
+
+        <div class="input-group">
+            <label for="title">답글 제목</label>
+            <input type="text" id="title" name="title" placeholder="답글 제목을 입력하세요" required>
+        </div>
+
+        <div class="input-group">
+            <label for="content">답글 내용</label>
+            <textarea id="content" name="content" placeholder="답글 내용을 입력해주세요" required></textarea>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="submit-btn">답글 등록</button>
+            <a href="javascript:history.back();" class="cancel-btn">취소</a>
+        </div>
+    </form>
+</main>
+</body>
+<%- include('footer') %>
+</html>

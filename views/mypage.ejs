@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <title>마이페이지</title>
+    <link rel="stylesheet" href="./stylesheets/style.css">
+    <style>
+        /* ==========================================================================
+   👤 마이페이지 허브 독점 터미널 레이아웃 (HTML 수정 금지 대응 스펙)
+   ========================================================================== */
+
+        /* 1. <section> 태그를 화면 중앙 정렬 및 여백을 확보하는 컨테이너로 격상 */
+        body > section {
+            max-width: 600px;
+            margin: 60px auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        /* 2. 마이페이지 타이틀이 명시되지 않은 구조이므로, section 상단에 사이버펑크 골드 후광 데코레이션 주입 */
+        body > section::before {
+            display: block;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 2px;
+            margin-bottom: 35px;
+            text-shadow: 0 0 12px rgba(212, 175, 55, 0.4);
+            border-bottom: 2px solid #d4af37;
+            padding-bottom: 15px;
+        }
+
+        /* 3. 투박한 기본 <ul> 리스트 레이아웃 제거 및 세로형 메뉴 스택 배치 */
+        body > section > ul {
+            list-style: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            display: flex;
+            flex-direction: column;
+            gap: 16px; /* 메뉴 카드 간의 완벽한 간격 조율 */
+        }
+
+        /* 4. <li> 요소를 개별 클릭 가능한 고급 메탈릭 다크 카드로 커스텀 */
+        body > section > ul > li {
+            background: #11141a !important; /* 기존 style.css의 시그니처 다크 그레이 */
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            border-left: 4px solid rgba(212, 175, 55, 0.4) !important; /* 좌측 클래식 골드 포인트선 */
+            border-radius: 4px 8px 8px 4px;
+            padding: 0 !important; /* 패딩을 0으로 만들어 내부 <a> 태그의 클릭 영역을 극대화 */
+            margin: 0 !important;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 5. <li> 카드 내부의 링크(<a>) 글꼴 확장 및 호버 범위 100% 동기화 */
+        body > section > ul > li > a {
+            display: block; /* 🌟 중요: 텍스트가 아닌 카드 전체 영역을 누를 수 있게 전환 */
+            padding: 20px 25px;
+            color: #cbd5e1 !important;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none !important;
+            text-align: left; /* 글자 좌측 정렬 */
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        /* 6. 각 메뉴 우측 끝에 은은한 하이테크 화살표(→) 아이콘 가상 주입 */
+        body > section > ul > li > a::after {
+            content: "→";
+            position: absolute;
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #4a5568;
+            font-size: 1.2rem;
+            transition: all 0.2s ease;
+        }
+
+        /* ==========================================================================
+           ⚡ 인텔리전트 마우스 마이크로 상호작용 (Hover Interaction)
+           ========================================================================== */
+
+        /* 카드가 떠오르며 골드 테두리가 네온처럼 발광하는 연출 */
+        body > section > ul > li:hover {
+            border-left-color: #d4af37 !important;
+            border-color: rgba(212, 175, 55, 0.2) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 12px rgba(212, 175, 55, 0.1);
+        }
+
+        /* 호버 시 텍스트가 황금빛으로 물들고 우측 화살표가 밖으로 튕겨 나가는 모션 */
+        body > section > ul > li:hover > a {
+            color: #f3e5ab !important; /* 기존 헤더 h1과 매칭되는 연한 골드 톤 */
+            text-shadow: 0 0 8px rgba(243, 229, 171, 0.3);
+        }
+
+        body > section > ul > li:hover > a::after {
+            color: #d4af37;
+            right: 20px; /* 화살표가 우측으로 스르륵 움직이는 이펙트 */
+        }
+    </style>
+</head>
+<body>
+<%- include('header') %>
+<section>
+    <h2>마이페이지</h2>
+    <ul>
+        <li>
+            <a href="./mypage/userinfo">회원정보</a>
+        </li>
+        <li>
+            <a href="./mypage/wishlist">위시리스트</a>
+        </li>
+        <li>
+            <a href="./mypage/orderlist">주문내역</a>
+        </li>
+    </ul>
+</section>
+</body>
+<%- include('footer') %>
+</html>

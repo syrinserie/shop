@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title><%= post ? '글 수정' : (parentId ? '답글 작성': '새 글 작성') %></title>
+    <link rel="stylesheet" href="../../stylesheets/style.css">
+    <link rel="stylesheet" href="../stylesheets/style.css">
+    <link rel="stylesheet" href="./stylesheets/style.css">
+</head>
+<%- include('header') %>
+<body>
+<main class="form-container">
+    <h2><%= post ? '글 수정' : (parentId ? '답글 작성': '새 글 작성') %></h2>
+
+    <div class="author-info">
+        작성자: <span><%= user ? user.username : '익명' %></span>
+    </div>
+
+    <form action="<%= post ? '../../board/edit/' + post.id : '/board/new' %>" method="post">
+        <input type="hidden" name="parent_id" value="<%= post ? post.parent_id : parentId %>">
+
+        <div class="input-group">
+            <label for="title">제목</label>
+            <input type="text" id="title" name="title" placeholder="제목을 입력하세요" value="<%= post?.title || '' %>" required>
+        </div>
+
+        <div class="input-group">
+            <label for="content">내용</label>
+            <textarea id="content" name="content" placeholder="내용을 입력해주세요" required><%= post?.content || '' %></textarea>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="submit-btn">저장하기</button>
+            <a href="javascript:history.back();" class="cancel-btn">취소</a>
+        </div>
+    </form>
+</main>
+</body>
+<%- include('footer') %>
+</html>

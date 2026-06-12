@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="./stylesheets/style.css">
+    <style>
+      #banner-text {
+        /* 1. 기본 레이아웃 정비 (인라인 마진 오버라이딩 및 중앙 정렬) */
+        margin: 35px 40px 15px 40px !important;
+        text-align: center;
+        padding: 18px 20px;
+
+        /* 2. 기존 다크/골드 테마 기조 반영 */
+        background: #11141a; /* 헤더 및 카드와 통일감 있는 다크 흑철색 */
+        border: 1px solid rgba(212, 175, 55, 0.15); /* 은은한 골드 프레임 선 */
+        border-radius: 6px;
+
+        /* 3. 사이버펑크 폰트 이펙트 */
+        color: #f3e5ab !important; /* 부드러운 클래식 골드 컬러 */
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        text-shadow: 0 0 10px rgba(243, 229, 171, 0.35); /* 연한 발광 네온 효과 */
+
+        /* 4. 문구가 바뀔 때마다 부드러운 전환을 만들어주는 브라우저 엔진 부착 */
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+        /* 5. 로드 시 최초로 들어오는 은은한 등장 웰컴 애니메이션 */
+        animation: bannerPulse 4s infinite alternate;
+      }
+
+      /* ⚡ 배너 전체에 가만히 있어도 앰비언트 불빛이 흐르는 듯한 유동 광원 연출 */
+      @keyframes bannerPulse {
+        0% {
+          border-color: rgba(212, 175, 55, 0.15);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        100% {
+          border-color: rgba(212, 175, 55, 0.35);
+          box-shadow: 0 4px 15px rgba(212, 175, 55, 0.08);
+        }
+      }
+    </style>
+    <script>
+      document.addEventListener("DOMContentLoaded",()=>{
+        const phrases = [
+                "오늘의 신선한 과일을 만나보세요!",
+                "인기 많은 과일을 지금 확인해보세요!",
+                "달콤한 오렌지 무료배송 중!",
+                "포도로 건강 챙기세요!"
+        ];
+
+        const bannerText = document.getElementById("banner-text");
+        let current = 0;
+
+        setInterval(()=>{
+          current = (current + 1) % phrases.length;
+          bannerText.textContent = phrases[current];
+        }, 3000);
+      });
+    </script>
+  </head>
+  <body>
+  <%- include('header') %>
+  <div id="banner-text" style="margin-top: 15px; font-size: 1.2em; ">
+    오늘의 신선한 과일을 만나보세요!
+  </div>
+  <section class="info-bar">
+    현재 등록된 상품 수: <%= allProducts.length %>개
+    <a href="./products/all">전체 목록 보기</a>
+  </section>
+  <section>
+    <h2>오늘의 상품 추천</h2>
+    <div class="product-grid">
+      <% featuredProducts.forEach(product =>{ %>
+        <div class="product-card">
+          <img src="<%= product.image %>" alt="<%= product.name%>">
+          <h3><%= product.emoji %><%= product.name %></h3>
+          <p><%= product.description %></p>
+          <p>남은 수량: <%= product.quantity %>개</p>
+          <strong>￦<%= product.price.toLocaleString() %></strong>
+
+          <form action="./mypage/wishlist/update" method="POST">
+            <input type="hidden" name="productId" value="<%= product.id %>">
+            <% if (wishedProductIds.includes(product.id)) { %>
+              <button type="submit" class="wish-button" name="action" value="remove">위시리스트에서 제거</button>
+            <%} else {%>
+              <button type="submit" class="wish-button" name="action" value="add">위시리스트에 추가</button>
+            <% } %>
+          </form>
+          <form action="./cart/add" method="POST">
+            <input type="hidden" name="productId" value="<%= product.id %>">
+            <button type="submit" class="cart-button">장바구니 담기</button>
+          </form>
+        </div>
+      <% }) %>
+    </div>
+  </section>
+  </body>
+  <%- include('footer') %>
+</html>

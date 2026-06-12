@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <title>마이페이지</title>
+    <link rel="stylesheet" href="../stylesheets/style.css">
+    <style>
+        /* 회원 관리 화면 전역 컨테이너 */
+        .user-terminal-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* 터미널 상단 헤더 구분선 */
+        .terminal-header-title {
+            margin-bottom: 30px;
+            border-left: 4px solid #ff0055;
+            padding-left: 15px;
+        }
+
+        .terminal-header-title h2 {
+            margin: 0;
+            font-size: 1.6rem;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255, 0, 85, 0.3);
+            letter-spacing: 1px;
+        }
+
+        /* 유저 정보 반응형 카드 그리드 배치 */
+        .user-matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        /* 일반 유저 정보용 다크/골드 카드 스타일 */
+        .user-data-card {
+            background-color: #11141a;
+            border: 1px solid #d4af37;
+            border-radius: 8px;
+            padding: 22px;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .user-data-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.15);
+        }
+
+        /* ★ [조건부 적용] 운영자(is_admin === 1) 특별 예외 네온 행동 레드 스킨 ★ */
+        .user-data-card.admin-security-glow {
+            border: 2px solid #ff0055 !important;
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.25), inset 0 0 10px rgba(255, 0, 85, 0.1);
+        }
+
+        .user-data-card.admin-security-glow:hover {
+            box-shadow: 0 0 22px rgba(255, 0, 85, 0.45);
+        }
+
+        /* 우측 상단 메타 식별 배지 */
+        .authority-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 0.72rem;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-general {
+            background-color: rgba(212, 175, 55, 0.1);
+            color: #d4af37;
+            border: 1px solid #d4af37;
+        }
+
+        .badge-root-admin {
+            background-color: rgba(255, 0, 85, 0.15);
+            color: #ff0055;
+            border: 1px solid #ff0055;
+            text-shadow: 0 0 5px rgba(255, 0, 85, 0.5);
+        }
+
+        /* 정보 분류 레이아웃 구조 세그먼트 */
+        .meta-segment {
+            margin-bottom: 12px;
+        }
+
+        .meta-label {
+            font-size: 0.75rem;
+            color: #8f9aa6;
+            margin-bottom: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .meta-value {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .meta-value.mono-id {
+            font-family: monospace;
+            color: #f3e5ab;
+        }
+
+        .meta-value.system-cash {
+            color: #22c55e;
+            /* 가상 통화는 선명한 연두색으로 직관성 확보 */
+            font-weight: 700;
+        }
+
+        /* 💡 추가: 회원 정보 수정 폼 내부 전역 입력 필드 스타일 */
+        .user-edit-form input {
+            width: 100%;
+            background: #0b0c10;
+            border: 1px solid #d4af37;
+            color: #ffffff;
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        .user-edit-form input:focus {
+            outline: none;
+            border-color: #ff0055;
+            box-shadow: 0 0 8px rgba(255, 0, 85, 0.3);
+        }
+
+        /* 💡 [변경/추가] 각 회원 카드의 테두리 색상과 매칭된 관리자 액션 버튼 스타일 */
+
+        /* 1. 수정하기 버튼: 해당 카드의 기본 테두리(골드) 색상 매핑 */
+        .btn-user-modify {
+            background-color: transparent !important;
+            border: 1px solid #d4af37 !important;
+            color: #d4af37 !important;
+            transition: all 0.2s ease;
+        }
+
+        .btn-user-modify:hover {
+            background-color: rgba(212, 175, 55, 0.1) !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+
+    </style>
+</head>
+<body>
+<%- include('header') %>
+<section>
+    <h2><%= user.username %>님의 정보</h2>
+    <div class="user-matrix-grid">
+        <div class="user-data-card <%= user.isAdmin === 1 ? 'admin-security-glow' : '' %>" id="user-card-<%= user.id %>">
+
+            <div class="display-area">
+                <% if (user.isAdmin === 1) { %>
+                    <span class="authority-badge badge-root-admin">운영자</span>
+                <% } else { %>
+                    <span class="authority-badge badge-general">일반 회원</span>
+                <% } %>
+
+                <div class="meta-segment" style="margin-top: 5px;">
+                    <div class="meta-label">유저 일련 번호</div>
+                    <div class="meta-value mono-id">#<%= user.id %></div>
+                </div>
+
+                <div class="meta-segment">
+                    <div class="meta-label">아이디</div>
+                    <div class="meta-value" style="color: #cbd5e1;"><%= user.username %></div>
+                </div>
+
+                <div class="meta-segment">
+                    <div class="meta-label">닉네임</div>
+                    <div class="meta-value"><%= user.name %></div>
+                </div>
+
+                <div class="meta-segment" style="margin-bottom: 0;">
+                    <div class="meta-label">보유금액</div>
+                    <div class="meta-value system-cash">￦<%= user.cash.toLocaleString() %></div>
+                </div>
+
+                <button type="button" class="cart-button btn-user-modify" onclick="openUserEdit('<%= user.id %>')">수정하기</button>
+            </div>
+
+            <form class="user-edit-form" action="../../mypage/userinfo/update" method="POST" style="display: none;">
+                <input type="hidden" name="userId" value="<%= user.id %>">
+
+                <div class="meta-segment" style="margin-top: 5px;">
+                    <div class="meta-label" style="color: #ff0055;">유저 일련 번호</div>
+                    <div class="meta-value mono-id" style="font-size: 0.95rem;">#<%= user.id %> (<%= user.username %>)</div>
+                </div>
+
+                <div class="meta-segment">
+                    <div class="meta-label">닉네임 수정</div>
+                    <input type="text" name="name" value="<%= user.name %>" placeholder="변경할 닉네임 입력" required>
+                </div>
+
+                <button type="submit" class="cart-button" style="background-color: #22c55e !important; border-color: #22c55e !important; color: #fff !important; margin-top: 10px !important;">변경사항 적용</button>
+                <button type="button" class="cart-button" style="background-color: #64748b !important; border-color: #64748b !important; color: #fff !important; margin-top: 4px !important;" onclick="closeUserEdit('<%= user.id %>')">취소</button>
+            </form>
+            <form action="../../mypage/userinfo/delete" method="post">
+                <button type="submit" class="delete-button" onclick="return confirm('정말 탈퇴하시겠습니까?')">탈퇴하기</button>
+            </form>
+        </div>
+    </div>
+</section>
+<script>
+    // 회원 제자리 수정 화면 팝업 활성화
+    function openUserEdit(id) {
+        const card = document.getElementById(`user-card-${id}`);
+        card.querySelector('.display-area').style.display = 'none';
+        card.querySelector('.user-edit-form').style.display = 'block';
+    }
+
+    // 수정 취소 원상 복구
+    function closeUserEdit(id) {
+        const card = document.getElementById(`user-card-${id}`);
+        card.querySelector('.display-area').style.display = 'block';
+        card.querySelector('.user-edit-form').style.display = 'none';
+    }
+</script>
+</body>
+
+<%- include('footer') %>
+</html>

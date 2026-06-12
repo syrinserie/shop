@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>주문 관리</title>
+    <link rel="stylesheet" href="../stylesheets/style.css">
+    <style>
+        /* 관리자 전용 주문 터미널 컨테이너 */
+        .admin-order-terminal {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .terminal-header {
+            margin-bottom: 30px;
+            border-left: 4px solid #ff0055; /* 운영자 시그니처 네온 레드 */
+            padding-left: 15px;
+        }
+
+        .terminal-header h2 {
+            margin: 0;
+            font-size: 1.6rem;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255, 0, 85, 0.3);
+            letter-spacing: 1px;
+        }
+
+
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        /* 주문 정보 종합 컨테이너 */
+        .order-matrix-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* 주문 한 건에 대한 마스터 카드 컴포넌트 */
+        .order-master-card {
+            border: 1px solid #d4af37; /* 기본 기사단 골드 테두리 */
+            background: #11141a;
+            border-radius: 8px;
+            padding: 22px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 상단 마스터 정보 헤더 메타 영역 */
+        .order-master-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+
+        .order-meta-info {
+            display: flex;
+            gap: 20px;
+            font-size: 0.95rem;
+        }
+
+        .order-meta-info strong {
+            color: #f3e5ab;
+        }
+
+        /* 💡 추가: 구매자 신원 정보 세그먼트 배지 */
+        .buyer-badge-zone {
+            background: rgba(212, 175, 55, 0.08);
+            border: 1px dashed rgba(212, 175, 55, 0.3);
+            padding: 8px 14px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 0.88rem;
+            color: #cbd5e1;
+        }
+
+        .buyer-badge-zone span {
+            margin-right: 15px;
+        }
+
+        .buyer-badge-zone .buyer-title {
+            color: #8f9aa6;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            margin-right: 4px;
+        }
+
+        /* 주문 내역 물품 리스트 */
+        .order-item-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 15px 0;
+        }
+
+        .order-item-list li {
+            padding: 6px 0;
+            color: #c5c6c7;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .order-item-list li:last-child {
+            border-bottom: none;
+        }
+
+        .item-cost-detail {
+            font-size: 0.88rem;
+            color: #8f9aa6;
+            margin-left: 6px;
+        }
+
+        /* 하단 정산 및 상태 관리 컨트롤 바 */
+        .order-master-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.08);
+        }
+
+        .total-amount-display {
+            font-size: 1rem;
+            color: #ffffff;
+        }
+
+        .total-amount-display .price-tag {
+            color: #d4af37;
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-shadow: 0 0 8px rgba(212, 175, 55, 0.2);
+        }
+
+        /* 👑 주문 상태 실시간 통제 시스템 컨트롤 셀렉터 박스 */
+        .status-control-hub {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-control-hub label {
+            font-size: 0.85rem;
+            color: #8f9aa6;
+        }
+
+        .status-select-dropdown {
+            background-color: #0b0c10;
+            border: 1px solid #ff0055; /* 관리 제어선은 네온 레드로 강조 */
+            color: #ffffff;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            cursor: pointer;
+            outline: none;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .status-select-dropdown:focus {
+            box-shadow: 0 0 8px rgba(255, 0, 85, 0.5);
+        }
+    </style>
+</head>
+<body>
+<%- include('../header') %>
+
+<main class="admin-order-terminal">
+
+    <a href="../admin" class="back-link">← 관리자 메뉴로 돌아가기</a>
+
+    <div class="terminal-header">
+        <h2>주문 관리</h2>
+    </div>
+
+    <div class="order-matrix-stack">
+        <% if (typeof orders !== 'undefined' && orders && orders.length > 0) { %>
+            <% orders.forEach(order => { %>
+
+                <div class="order-master-card">
+
+                    <div class="order-master-header">
+                        <div class="order-meta-info">
+                            <span><strong>주문 번호:</strong> #<%= order.order_id %></span>
+                            <span><strong>주문 시각:</strong> <%= order.created_at %></span>
+                        </div>
+                    </div>
+
+                    <div class="buyer-badge-zone">
+                        <span><span class="buyer-title">구매자 이름:</span><%= order.buyer_name %></span>
+                        <span><span class="buyer-title">ID:</span><%= order.buyer_username %></span>
+                        <span><span class="buyer-title">회원 번호:</span>#<%= order.user_id %></span>
+                    </div>
+
+                    <ul class="order-item-list">
+                        <% order.items.forEach(item => { %>
+                            <li>
+                                <%= item.product_emoji %> <strong><%= item.product_name %></strong>
+                                <span class="item-cost-detail">
+                                    (₩<%= item.order_price.toLocaleString() %> × <%= item.quantity %>개) = ￦<%= (item.order_price * item.quantity).toLocaleString() %>
+                                </span>
+                            </li>
+                        <% }) %>
+                    </ul>
+
+                    <div class="order-master-footer">
+                        <div class="total-amount-display">
+                            총 결제 금액: <span class="price-tag">₩<%= order.total_price.toLocaleString() %></span>
+                        </div>
+
+                        <form action="../admin/orders/update" method="POST" class="status-control-hub">
+                            <input type="hidden" name="orderId" value="<%= order.order_id %>">
+                            <label for="status-select-<%= order.order_id %>">주문 관리 상태 변경:</label>
+
+                            <select id="status-select-<%= order.order_id %>" name="status" class="status-select-dropdown" onchange="this.form.submit()">
+                                <option value="결제완료" <%= order.status === '결제완료' ? 'selected' : '' %>>결제완료</option>
+                                <option value="배송준비" <%= order.status === '배송준비' ? 'selected' : '' %>>배송준비</option>
+                                <option value="배송중" <%= order.status === '배송중' ? 'selected' : '' %>>배송중</option>
+                                <option value="배송완료" <%= order.status === '배송완료' ? 'selected' : '' %>>배송완료</option>
+                                <option value="주문취소" <%= order.status === '주문취소' ? 'selected' : '' %>>주문취소</option>
+                            </select>
+                        </form>
+                    </div>
+
+                </div>
+
+            <% }) %>
+        <% } else { %>
+            <div style="text-align: center; padding: 60px 0; color: #8f9aa6; border: 1px dashed #333; border-radius: 8px;">
+                주문 내역이 하나도 없습니다.
+            </div>
+        <% } %>
+    </div>
+
+</main>
+
+<%- include('../footer') %>
+</body>
+</html>

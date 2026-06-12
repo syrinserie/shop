@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>장바구니</title>
+    <link rel="stylesheet" href="../stylesheets/style.css">
+    <style>
+        /* ==========================================================================
+           🛒 장바구니 터미널 독점 고도화 레이아웃 (기존 다크/골드 테마 기조 반영)
+           ========================================================================== */
+
+        .cart-terminal-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* 터미널 상단 시그니처 골드 헤더 */
+        .cart-header-title {
+            margin-bottom: 25px;
+            border-left: 4px solid #d4af37;
+            padding-left: 15px;
+        }
+
+        .cart-header-title h2 {
+            margin: 0;
+            font-size: 1.6rem;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+            letter-spacing: 1px;
+        }
+
+        /* 내역 리스트 래퍼 */
+        .cart-matrix-stack {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* 아이템 로우 카드 스타일 (style.css의 내역 상자와 통일) */
+        .cart-item-card {
+            background: #11141a;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+        }
+
+        .cart-item-card:hover {
+            border-color: rgba(212, 175, 55, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        /* 장바구니 비었을 때 예외창 */
+        .cart-empty-state {
+            text-align: center;
+            padding: 60px 0;
+            color: #8f9aa6;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 1.05rem;
+        }
+
+        /* 좌측: 상품 메인 정보 (이모지 + 이름 + 단가) */
+        .cart-product-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .cart-product-emoji {
+            font-size: 1.5rem;
+        }
+
+        .cart-product-name {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #cbd5e1;
+        }
+
+        .cart-product-unit-price {
+            display: block;
+            font-size: 0.85rem;
+            color: #8f9aa6;
+            margin-top: 2px;
+        }
+
+        /* 중앙: 가로 배치형 정밀 수량 인라인 콘솔 */
+        .cart-quantity-console {
+            display: inline-flex;
+            align-items: center;
+            background: #0b0c10;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 2px;
+        }
+
+        .qty-toggle-btn {
+            background: transparent;
+            border: none;
+            color: #8f9aa6;
+            width: 32px;
+            height: 32px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qty-toggle-btn:hover {
+            background: rgba(212, 175, 55, 0.1);
+            color: #d4af37;
+        }
+
+        .qty-display-badge {
+            color: #ffffff;
+            font-weight: 600;
+            padding: 0 12px;
+            min-width: 35px;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        /* 우측: 서브토탈 스택 및 파괴적 제어 인터페이스 */
+        .cart-action-hub {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .cart-subtotal-price {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #f3e5ab;
+            text-shadow: 0 0 8px rgba(243, 229, 171, 0.2);
+            text-align: right;
+            min-width: 110px;
+        }
+
+        .cart-trash-btn {
+            background: rgba(229, 62, 62, 0.06);
+            border: 1px solid rgba(229, 62, 62, 0.2);
+            color: #ef4444;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .cart-trash-btn:hover {
+            background: #ef4444;
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+        }
+
+        /* 하단 정산 영수증 패널 포지셔닝 */
+        .cart-receipt-summary {
+            background: #11141a;
+            border-top: 2px solid #d4af37;
+            border-radius: 0 0 8px 8px;
+            padding: 24px 30px;
+            margin-top: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(212, 175, 55, 0.05);
+        }
+
+        .total-price-label {
+            font-size: 1.1rem;
+            color: #8f9aa6;
+            font-weight: 500;
+        }
+
+        .total-price-value {
+            color: #d4af37;
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-left: 10px;
+            text-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
+        }
+
+        /* 마스터 결제 버튼 스펙 업그레이드 */
+        .checkout-master-btn {
+            background-color: #22c55e;
+            color: #ffffff;
+            border: none;
+            padding: 12px 32px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+        }
+
+        .checkout-master-btn:hover {
+            background-color: #16a34a;
+            box-shadow: 0 0 16px rgba(22, 163, 74, 0.5);
+            transform: translateY(-1px);
+        }
+
+        /* 링크 인터페이스 */
+        .back-to-mall-gate {
+            display: inline-block;
+            margin-top: 20px;
+            color: #facc15;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .back-to-mall-gate:hover {
+            text-decoration: underline;
+            color: #fde047;
+        }
+    </style>
+</head>
+
+<body>
+<%- include('header') %>
+
+<main class="cart-terminal-container">
+
+    <div class="cart-header-title">
+        <h2>장바구니 내역</h2>
+    </div>
+
+    <ul class="cart-matrix-stack">
+        <% let totalPrice = 0; %>
+        <% if (cartItems.length === 0) { %>
+            <li class="cart-empty-state">
+                장바구니가 비어 있습니다.
+            </li>
+        <% } else { %>
+            <% cartItems.forEach(item => { %>
+                <li class="cart-item-card">
+
+                    <div class="cart-product-meta">
+                        <span class="cart-product-emoji"><%= item.emoji %></span>
+                        <div>
+                            <span class="cart-product-name"><%= item.name %></span>
+                            <span class="cart-product-unit-price">단가: ₩<%= item.price.toLocaleString() %></span>
+                        </div>
+                    </div>
+
+                    <div class="cart-quantity-console">
+                        <form action="<%= basePath %>/cart/update" method="POST" style="margin: 0; display: inline-flex; align-items: center; gap: 4px;">
+                            <input type="hidden" name="productId" value="<%= item.id %>">
+                            <button type="submit" name="action" value="decrease" class="qty-toggle-btn">-</button>
+                            <span class="qty-display-badge"><%= item.quantity %>개</span>
+                            <button type="submit" name="action" value="increase" class="qty-toggle-btn">+</button>
+                        </form>
+                    </div>
+
+                    <div class="cart-action-hub">
+                        <div class="cart-subtotal-price">
+                            ₩<%= (item.price * item.quantity).toLocaleString() %>
+                        </div>
+                        <form action="<%= basePath %>/cart/delete" method="POST" style="margin: 0;">
+                            <input type="hidden" name="productId" value="<%= item.id %>">
+                            <button type="submit" class="cart-trash-btn">삭제</button>
+                        </form>
+                    </div>
+
+                </li>
+                <% totalPrice += item.price * item.quantity %>
+            <% }) %>
+
+            <li class="cart-receipt-summary">
+                <div class="total-price-label">
+                    총 결제 예정 금액 <span class="total-price-value">₩<%= totalPrice.toLocaleString() %></span>
+                </div>
+                <form action="<%= basePath %>/order/confirm" method="POST" style="margin: 0;">
+                    <button type="submit" class="checkout-master-btn">주문하기</button>
+                </form>
+            </li>
+        <% } %>
+    </ul>
+
+    <p><a href="<%= basePath %>/products" class="back-to-mall-gate">← 쇼핑 계속하기 (상품 보러가기)</a></p>
+</main>
+
+<%- include('footer') %>
+</body>
+</html>

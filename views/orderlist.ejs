@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <title>주문 내역</title>
+    <link rel="stylesheet" href="../stylesheets/style.css">
+</head>
+<body>
+<%- include('header') %>
+<section>
+    <h2><%= user.name %>님의 주문 내역</h2>
+    <% if (orders.length === 0) { %>
+    <p>아직 주문하신 내역이 없습니다.</p>
+    <% } else { %>
+        <div class="order-container">
+            <% orders.forEach(order => { %>
+                <div class="order-box" style="border: 1px solid #d4af37; margin-bottom: 20px; padding: 20px; background: #11141a; border-radius: 8px;">
+                    <div class="order-header" style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 10px;">
+                        <span><strong>주문 번호:</strong> #<%= order.order_id %></span>
+                        <span><strong>주문 일시:</strong> <%= order.created_at %></span>
+                    </div>
+
+                    <ul class="order-item-list" style="list-style: none; padding: 0;">
+                        <% order.items.forEach(item => { %>
+                        <li style="margin-bottom: 8px; color: #c5c6c7;">
+                            <%= item.product_emoji %> <%= item.product_name %>
+                            <span style="font-size: 0.9rem; color: #8f9aa6;">
+                                (₩<%= item.order_price.toLocaleString() %> x <%= item.quantity %>개)
+                            </span>
+                        </li>
+                        <% }) %>
+                    </ul>
+
+                    <div class="order-footer" style="text-align: right; margin-top: 15px; padding-top: 10px; border-top: 1px dashed rgba(255,255,255,0.05);">
+                        <span style="margin-right: 15px;">상태: <strong style="color: #f3e5ab;"><%= order.status %></strong></span>
+                        <span>총 결제금액: <strong style="color: #d4af37; font-size: 1.15rem;">₩<%= order.total_price.toLocaleString() %></strong></span>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    <% } %>
+
+</section>
+</body>
+<%- include('footer') %>
+</html>

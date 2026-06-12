@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>SYSTEM ERROR</title>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <style>
+        .error-terminal {
+            max-width: 600px;
+            margin: 80px auto;
+            padding: 40px;
+            background: #11141a;
+            border: 2px solid #ff0055; /* 경고 메시지는 운영자 레드 테마 */
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.2);
+        }
+        .error-terminal h2 {
+            color: #ff0055;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 0, 85, 0.4);
+        }
+        .error-desc {
+            color: #cbd5e1;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .home-btn {
+            display: inline-block;
+            padding: 10px 24px;
+            background: #4a5568;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .home-btn:hover { background: #64748b; }
+    </style>
+</head>
+<body>
+<%- include('header') %>
+
+<main class="error-terminal">
+    <h2><%= error.status %> 오류 발생</h2>
+    <p class="error-desc">
+        <%= message %> </p>
+    <a href="/" class="home-btn">홈 화면으로 돌아가기</a>
+</main>
+
+<%- include('footer') %>
+</body>
+</html>

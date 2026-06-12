@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>상품 관리</title>
+    <link rel="stylesheet" href="../stylesheets/style.css">
+    <style>
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+        }
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+        .product-card img {
+            width: 100%;
+            max-height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .cart-button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #22c55e;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .cart-button:hover {
+            background-color: #16a34a;
+        }
+
+        .back-link {
+            color: #facc15;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <style>
+        /* 수정 모드 내부 전역 입력 필드 스타일 */
+        .edit-mode input, .edit-mode textarea {
+            width: 100%;
+            background: #1a1e26; /* 헤더 톤의 어두운 배경 */
+            border: 1px solid #d4af37; /* 시그니처 골드 테두리 */
+            color: #ffffff;
+            margin-bottom: 6px;
+            padding: 6px;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 0.85rem;
+        }
+        .edit-mode label {
+            display: block;
+            font-size: 0.75rem;
+            color: #d4af37;
+            margin-top: 4px;
+            margin-bottom: 2px;
+            text-align: left;
+        }
+
+        h2{
+            margin: 0;
+            font-size: 1.6rem;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255, 0, 85, 0.3);
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+<%- include('../header') %>
+<main>
+    <a href="../admin" class="back-link">← 관리자 메뉴로 돌아가기</a>
+
+    <h2>상품 관리</h2>
+
+    <div class="product-grid">
+        <div class="product-card" id="product-card-add-new" style="border: 1px dashed #2563eb;">
+
+            <div class="display-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 320px; cursor: pointer;" onclick="openEditMode('add-new')">
+                <span style="font-size: 3rem; color: #2563eb;">+</span>
+                <strong style="color: #2563eb !important; margin: 5px 0;">새 상품 추가하기</strong>
+            </div>
+
+            <form class="edit-form" action="../admin/products/add" method="POST" style="display: none; text-align: left; padding: 5px;">
+                <h3 style="margin-top: 0; color: #2563eb; font-size: 1.1rem; text-align: center;">신규 상품 등록</h3>
+
+                <div style="margin-bottom: 8px;">
+                    <label style="display:block; font-size:0.8rem; color:#888;">이모지 & 상품명</label>
+                    <div style="display: flex; gap: 4px;">
+                        <input type="text" name="emoji" style="width: 25%; text-align: center;" placeholder="🍎">
+                        <input type="text" name="name" style="width: 75%;" placeholder="예: 신선한 딸기" required>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 8px;">
+                    <label style="display:block; font-size:0.8rem; color:#888;">상품 설명</label>
+                    <textarea name="description" rows="2" style="width:100%; box-sizing:border-box;" placeholder="상품에 대한 상세 정보를 적어주세요" required></textarea>
+                </div>
+
+                <div style="margin-bottom: 8px;">
+                    <label style="display:block; font-size:0.8rem; color:#888;">수량 & 가격</label>
+                    <div style="display: flex; gap: 4px;">
+                        <input type="number" name="quantity" style="width: 50%;" placeholder="수량(개)" required>
+                        <input type="number" name="price" style="width: 50%;" placeholder="가격(₩)" required>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 8px;">
+                    <label style="display:block; font-size:0.8rem; color:#888;">이미지 경로</label>
+                    <input type="text" name="image" style="width:100%; box-sizing:border-box;" placeholder="./images/product.jpg" required>
+                </div>
+
+                <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                    <input type="checkbox" id="featured-add-new" name="is_featured" value="1" style="width: auto; cursor: pointer;">
+                    <label for="featured-add-new" style="font-size:0.85rem; color:#facc15; cursor: pointer; user-select: none;">메인화면 추천 상품 노출</label>
+                </div>
+
+                <button type="submit" class="cart-button" style="background-color: #2563eb;">상품 등록하기</button>
+                <button type="button" class="cart-button" style="background-color: #64748b; margin-top: 4px;" onclick="closeEditMode('add-new')">취소</button>
+            </form>
+        </div>
+
+        <% products.forEach(p => { %>
+            <div class="product-card" id="product-card-<%= p.id %>">
+
+                <div class="display-area">
+                    <img src="../<%= p.image %>" alt="<%= p.name %>">
+                    <h3><%= p.emoji %><%= p.name %>
+                        <% if (p.is_featured === 1) { %>
+                            <span style="color: #facc15; font-size: 0.9em;">추천</span>
+                        <% } %>
+                    </h3>
+
+                    <p><%= p.description %></p>
+                    <p>남은 수량: <%= p.quantity %>개</p>
+                    <strong>￦<%= p.price.toLocaleString() %></strong>
+
+                    <button type="button" class="cart-button" style="background-color: #2563eb;" onclick="openEditMode('<%= p.id %>')">수정하기</button>
+                    <button type="button" class="cart-button" style="background-color: #2563eb;" onclick="deleteProduct('<%= p.id %>', '<%= p.name %>')">삭제하기</button>
+                </div>
+
+                <form class="edit-form" action="../admin/products/update" method="POST" style="display: none; text-align: left; padding: 5px;">
+                    <input type="hidden" name="productId" value="<%= p.id %>">
+
+                    <div style="margin-bottom: 8px;">
+                        <label style="display:block; font-size:0.8rem; color:#888;">이모지 & 상품명</label>
+                        <div style="display: flex; gap: 4px;">
+                            <input type="text" name="emoji" value="<%= p.emoji %>" style="width: 25%; text-align: center;" placeholder="이모지">
+                            <input type="text" name="name" value="<%= p.name %>" style="width: 75%;" placeholder="상품명" required>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 8px;">
+                        <label style="display:block; font-size:0.8rem; color:#888;">상품 설명</label>
+                        <textarea name="description" rows="2" style="width:100%; box-sizing:border-box;" placeholder="설명" required><%= p.description %></textarea>
+                    </div>
+
+                    <div style="margin-bottom: 8px;">
+                        <label style="display:block; font-size:0.8rem; color:#888;">수량 & 가격</label>
+                        <div style="display: flex; gap: 4px;">
+                            <input type="number" name="quantity" value="<%= p.quantity %>" style="width: 50%;" placeholder="수량" required>
+                            <input type="number" name="price" value="<%= p.price %>" style="width: 50%;" placeholder="가격" required>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 12px;">
+                        <label style="display:block; font-size:0.8rem; color:#888;">이미지 경로</label>
+                        <input type="text" name="image" value="<%= p.image %>" style="width:100%; box-sizing:border-box;" placeholder="이미지 경로" required>
+                    </div>
+
+                    <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                        <input type="checkbox" id="featured-<%= p.id %>" name="is_featured" value="1" <%= p.is_featured === 1 ? 'checked' : '' %> style="width: auto; cursor: pointer;">
+                        <label for="featured-<%= p.id %>" style="font-size:0.85rem; color:#facc15; cursor: pointer; user-select: none;">추천 상품</label>
+                    </div>
+
+                    <button type="submit" class="cart-button" style="background-color: #22c55e;">변경사항 저장</button>
+                    <button type="button" class="cart-button" style="background-color: #64748b; margin-top: 4px;" onclick="closeEditMode('<%= p.id %>')">취소</button>
+                </form>
+
+            </div>
+        <% }) %>
+    </div>
+</main>
+<%- include('../footer') %>
+</body>
+<script>
+    function openEditMode(id) {
+        const card = document.getElementById(`product-card-${id}`);
+        card.querySelector('.display-area').style.display = 'none';
+        card.querySelector('.edit-form').style.display = 'block';
+    }
+
+    function closeEditMode(id) {
+        const card = document.getElementById(`product-card-${id}`);
+        card.querySelector('.display-area').style.display = 'block';
+        card.querySelector('.edit-form').style.display = 'none';
+    }
+
+    //상품 삭제 확인 및 데이터 전송 함수
+    function deleteProduct(id, name) {
+        if (confirm(`정말로 [${name}] 상품을 시스템 데이터에서 영구히 삭제하시겠습니까?`)) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '<%= basePath %>/admin/products/delete';
+
+            const hiddenField = document.createElement('input');
+            hiddenField.type = 'hidden';
+            hiddenField.name = 'productId';
+            hiddenField.value = id;
+
+            form.appendChild(hiddenField);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+</script>
+</html>
