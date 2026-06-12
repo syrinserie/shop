@@ -74,42 +74,23 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-//포트 설정
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+const PORT = process.env.PORT || 3000;
+app.set('port', PORT);
 
-//HTTP 서버 생성
 var server = http.createServer(app);
 
-//서버 리스닝 시작
-server.listen(port);
+server.listen(PORT);
 server.on('error', onError);
 server.on('listening', onListening);
-
-function normalizePort(val) {
-  var port = parseInt(val, 10);
-
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
-
-  if (port >= 0) {
-    // port number
-    return port;
-  }
-
-  return false;
-}
 
 function onError(error) {
   if (error.syscall !== 'listen') {
     throw error;
   }
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+  var bind = typeof PORT === 'string'
+    ? 'Pipe ' + PORT
+    : 'Port ' + PORT;
 
   switch (error.code) {
     case 'EACCES':
@@ -131,5 +112,5 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
-  console.log('Server is running on ' + bind); // 관리자가 실행 확인하기 편하도록 로그 추가
+  console.log('Server is running on ' + bind);
 }
